@@ -22,7 +22,7 @@ class KidsHomePageState extends State<KidsHomePage> {
   int _maxNumber = 99;
   int _currentDisplayedQuestion = 0;
   int _userScore = 0;
-  List<QuestionAnswer> questionsAnswers = [];
+  List<Map<String, Object>> questionsAnswers = [];
 
   _selectQuestionType(String type) {
     // _audioCache.play('tap_sound.mp3');
@@ -56,59 +56,23 @@ class KidsHomePageState extends State<KidsHomePage> {
   }
 
   _startQuiz() {
+    questionsAnswers = QuestionAnswer(
+            isQuestionTypeAdd: _isQuestionTypeAdd,
+            isQuestionTypeSubtract: _isQuestionTypeSubtract,
+            maxNumber: _maxNumber,
+            minNumber: _minNumber,
+            numberOfQuestions: _numberOfQuestions)
+        .questions;
     setState(() {
-      _hasQuizStarted = false;
+      _hasQuizStarted = true;
     });
-    for (var i = 0; i < _numberOfQuestions; i++) {
-      print(i);
-      var random = new Random();
-      int firstNumber;
-      int secondNumber;
-      int answerNumber;
-      String questionStatement;
-      bool actualAnswer;
-
-      firstNumber = _minNumber + random.nextInt(_maxNumber - _minNumber);
-      secondNumber = _minNumber + random.nextInt(_maxNumber - _minNumber);
-
-      if (firstNumber < secondNumber && _isQuestionTypeSubtract) {
-        firstNumber = secondNumber;
-        secondNumber = firstNumber;
-      }
-
-      if (i == firstNumber || i == secondNumber) {
-        answerNumber = _minNumber + random.nextInt(_maxNumber - _minNumber);
-      } else {
-        if (_isQuestionTypeAdd) {
-          answerNumber = firstNumber + secondNumber;
-        } else {
-          answerNumber = firstNumber - secondNumber;
-        }
-      }
-
-      questionStatement =
-          "$firstNumber ${_isQuestionTypeAdd ? '+' : '-'} $secondNumber = $answerNumber";
-      if (_isQuestionTypeAdd && answerNumber == firstNumber + secondNumber ||
-          _isQuestionTypeSubtract &&
-              answerNumber == firstNumber - secondNumber) {
-        actualAnswer = true;
-      } else {
-        actualAnswer = false;
-      }
-      questionsAnswers.add(QuestionAnswer(questionStatement, actualAnswer));
-      print(
-          "$firstNumber + $secondNumber = $answerNumber ? Actual Answer will be $actualAnswer");
-      setState(() {
-        _hasQuizStarted = true;
-      });
-    }
   }
 
   _answerSelectedByUser(bool userAnswer) {
     print("userSelected Answer $userAnswer");
     print(
-        "actual answer ${questionsAnswers[_currentDisplayedQuestion].answer}");
-    if (userAnswer == questionsAnswers[_currentDisplayedQuestion].answer) {
+        "actual answer ${questionsAnswers[_currentDisplayedQuestion]["answer"]}");
+    if (userAnswer == questionsAnswers[_currentDisplayedQuestion]["answer"]) {
       _userScore = _userScore + 1;
     }
     if (_currentDisplayedQuestion <= _numberOfQuestions - 1) {
@@ -175,8 +139,8 @@ class KidsHomePageState extends State<KidsHomePage> {
                           : _currentDisplayedQuestion <= _numberOfQuestions - 1
                               ? Questions(
                                   currentQuestion: questionsAnswers[
-                                          _currentDisplayedQuestion]
-                                      .question,
+                                          _currentDisplayedQuestion]["question"]
+                                      as String,
                                   answerSelectedByUser: _answerSelectedByUser,
                                 )
                               : Result(
