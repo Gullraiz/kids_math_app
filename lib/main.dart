@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/KidsHomePage_Screen.dart';
+import 'screens/kids_home_page_screen.dart';
 
 void main() {
   runApp(MyApp());
